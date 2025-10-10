@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using App.Topics.LinkedList.T2b_DoubleLinkedList;
+using NUnit.Framework.Legacy;
 
 namespace App.Tests.Topics.LinkedList.T2b_DoubleLinkedList;
 

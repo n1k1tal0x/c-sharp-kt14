@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using App.Topics.LinkedList.T2_LinkedList;
+using NUnit.Framework.Legacy;
 
 namespace App.Tests.Topics.LinkedList.T2_LinkedList;
 
