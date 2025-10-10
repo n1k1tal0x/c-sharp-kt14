@@ -8,94 +8,71 @@ namespace App.Tests.Topics.LinkedList.T2b_DoubleLinkedList;
 public class DoubleLinkedListTests
 {
     [Test]
-    public void Empty_Current_Throws()
+    public void Create_AddBefore_AddAfter_LinksAndOrder()
     {
-        var list = new DoubleLinkedList<int>();
-        Assert.Throws<InvalidOperationException>(() => { var _ = list.Current; });
-        Assert.That(list.IsEmpty, Is.True);
-        Assert.That(list.Count, Is.EqualTo(0));
+        var node = new DoubleLinkedList<int>(2); // [2]
+        node.AddBefore(1);                       // [1,2]
+        node.AddAfter(3);                        // [1,2,3]
+
+        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, node.ToArray());
+
+        Assert.That(node.Prev!.Value, Is.EqualTo(1));
+        Assert.That(node.Next!.Value, Is.EqualTo(3));
+        Assert.That(node.Prev!.Next, Is.SameAs(node));
+        Assert.That(node.Next!.Prev, Is.SameAs(node));
     }
 
     [Test]
-    public void Empty_AddBeforeOrAfterCurrent_Throws()
+    public void AddFirst_AddLast_FromMiddle_BuildsEnds()
     {
-        var list = new DoubleLinkedList<int>();
-        Assert.Throws<InvalidOperationException>(() => list.AddBeforeCurrent(1));
-        Assert.Throws<InvalidOperationException>(() => list.AddAfterCurrent(1));
+        var node = new DoubleLinkedList<int>(2); // [2]
+        node.AddBefore(1);                       // [1,2]
+        node.AddAfter(3);                        // [1,2,3]
+
+        node.AddFirst(0);                        // [0,1,2,3]
+        node.AddLast(4);                         // [0,1,2,3,4]
+
+        CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4 }, node.ToArray());
+        Assert.That(node.Value, Is.EqualTo(2));
+        Assert.That(node.Prev!.Value, Is.EqualTo(1));
+        Assert.That(node.Next!.Value, Is.EqualTo(3));
     }
 
     [Test]
-    public void AddFirst_AddLast_ToArray_AndNavigation()
+    public void Count_IsSame_FromAnyNode()
     {
-        var list = new DoubleLinkedList<int>();
-        list.AddFirst(2);         // [2]
-        list.AddFirst(1);         // [1,2]
-        list.AddLast(3);          // [1,2,3]
+        var mid = new DoubleLinkedList<string>("b"); // [b]
+        mid.AddBefore("a");                           // [a,b]
+        mid.AddAfter("c");                            // [a,b,c]
+        mid.AddLast("d");                             // [a,b,c,d]
+        mid.AddFirst("0");                            // [0,a,b,c,d]
 
-        Assert.That(list.IsEmpty, Is.False);
-        Assert.That(list.Count, Is.EqualTo(3));
-        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, list.ToArray());
+        // get head
+        var head = mid;
+        while (head.Prev != null) head = head.Prev;
 
-        list.MoveFirst();
-        Assert.That(list.Current, Is.EqualTo(1));
-        Assert.That(list.MoveNext(), Is.True);
-        Assert.That(list.Current, Is.EqualTo(2));
-        Assert.That(list.MoveNext(), Is.True);
-        Assert.That(list.Current, Is.EqualTo(3));
-        Assert.That(list.MoveNext(), Is.False); // на последнем
-        Assert.That(list.Current, Is.EqualTo(3));
-        Assert.That(list.MovePrev(), Is.True);
-        Assert.That(list.Current, Is.EqualTo(2));
-        Assert.That(list.MovePrev(), Is.True);
-        Assert.That(list.Current, Is.EqualTo(1));
-        Assert.That(list.MovePrev(), Is.False); // на первом
-        Assert.That(list.Current, Is.EqualTo(1));
+        // get tail
+        var tail = mid;
+        while (tail.Next != null) tail = tail.Next;
+
+        Assert.That(head.Count, Is.EqualTo(5));
+        Assert.That(mid.Count, Is.EqualTo(5));
+        Assert.That(tail.Count, Is.EqualTo(5));
     }
 
     [Test]
-    public void AddBeforeCurrent_And_AddAfterCurrent_PreserveCurrent()
+    public void HeadAndTail_Nulls_OnEnds()
     {
-        var list = new DoubleLinkedList<int>();
-        list.AddLast(1);          // [1]
-        list.AddLast(3);          // [1,3]
+        var mid = new DoubleLinkedList<int>(1);
+        mid.AddLast(2);
+        mid.AddLast(3);
+        mid.AddFirst(0);
 
-        list.MoveLast();          // current -> 3
-        list.AddBeforeCurrent(2); // [1,2,3], current stays at 3
-        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, list.ToArray());
-        Assert.That(list.Current, Is.EqualTo(3));
+        var head = mid; while (head.Prev != null) head = head.Prev;
+        var tail = mid; while (tail.Next != null) tail = tail.Next;
 
-        list.MoveFirst();         // current -> 1
-        list.AddAfterCurrent(10); // [1,10,2,3], current stays at 1
-        CollectionAssert.AreEqual(new[] { 1, 10, 2, 3 }, list.ToArray());
-        Assert.That(list.Current, Is.EqualTo(1));
-
-        Assert.That(list.MoveNext(), Is.True);  // current -> 10
-        Assert.That(list.Current, Is.EqualTo(10));
-    }
-
-    [Test]
-    public void SingleElement_MovePrevNext_ReturnFalse()
-    {
-        var list = new DoubleLinkedList<string>();
-        list.AddFirst("only");
-        list.MoveFirst();
-        Assert.That(list.MovePrev(), Is.False);
-        Assert.That(list.MoveNext(), Is.False);
-        Assert.That(list.Current, Is.EqualTo("only"));
-    }
-
-    [Test]
-    public void AddAfterCurrent_WhenAtLast_Appends()
-    {
-        var list = new DoubleLinkedList<int>();
-        list.AddLast(1);
-        list.AddLast(2);
-        list.MoveLast();          // current -> 2
-        list.AddAfterCurrent(3);  // [1,2,3]
-
-        Assert.That(list.Current, Is.EqualTo(2)); // current not changed
-        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, list.ToArray());
-        list.MoveNext();
-        Assert.That(list.Current, Is.EqualTo(3));
+        Assert.That(head.Prev, Is.Null);
+        Assert.That(tail.Next, Is.Null);
+        CollectionAssert.AreEqual(new[] { 0, 1, 2, 3 }, mid.ToArray());
     }
 }

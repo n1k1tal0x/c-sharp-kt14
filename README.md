@@ -70,18 +70,18 @@ Namespace: `App.Topics.LinkedList.T2_LinkedList`
 ### Доп. задача: Двусвязный список
 Namespace: `App.Topics.LinkedList.T2b_DoubleLinkedList`
 
-Реализуйте класс:
+Реализуйте узел двусвязного списка в виде одного класса:
 - `public class DoubleLinkedList<T>`
-  - Свойства: `int Count { get; }`, `bool IsEmpty { get; }`, `T Current { get; }`
-    - `Current` недоступен в пустом списке → `InvalidOperationException`.
-  - Навигация: `bool MoveNext()`, `bool MovePrev()`, `void MoveFirst()`, `void MoveLast()`
-    - `MoveNext/MovePrev` возвращают `false`, если переход невозможен (на последнем/первом элементе).
-  - Модификация: `void AddFirst(T value)`, `void AddLast(T value)`, `void AddBeforeCurrent(T value)`, `void AddAfterCurrent(T value)`
-    - На `AddBeforeCurrent/AddAfterCurrent` при пустом списке → `InvalidOperationException`.
-    - Текущая позиция при добавлениях не меняется (указатель остаётся на прежнем элементе).
-  - Утилита для тестов: `T[] ToArray()` — возвращает элементы слева направо.
+  - Свойства/поля узла: `T Value { get; }`, `DoubleLinkedList<T>? Prev { get; }`, `DoubleLinkedList<T>? Next { get; }`
+  - Свойство `int Count { get; }` — возвращает общее число узлов списка, вычисляя его через проход к началу (`Prev`) и к концу (`Next`) от текущего узла.
+  - Методы модификации (принимают только значение, ссылки выставляются внутри класса):
+    - `void AddBefore(T value)` — вставка нового узла перед текущим узлом.
+    - `void AddAfter(T value)` — вставка нового узла после текущего узла.
+    - `void AddFirst(T value)` — вставка нового узла в начало списка (перед «головой» списка).
+    - `void AddLast(T value)` — вставка нового узла в конец списка (после «хвоста» списка).
+  - Утилита: `T[] ToArray()` — возвращает элементы от головы к хвосту.
 
-Краевые случаи: пустой список (доступ к `Current`, `AddBeforeCurrent/AfterCurrent`), единичный элемент, добавление до первого и после последнего, смешанные операции навигации/вставки.
+Краевые случаи: список из одного узла, вставки в начало/конец при работе из середины, корректность двусторонних связей (`Prev`/`Next`) и расчёта `Count` при обращении из любого узла.
 
 ---
 
