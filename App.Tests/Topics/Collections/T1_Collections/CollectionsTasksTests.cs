@@ -27,6 +27,7 @@ public class CollectionsTasksTests
     }
 
     [Test]
+
     public void Generic_StringsWithSpacesAndDuplicates_CaseInsensitive()
     {
         IEnumerable<string> input = new[] { " a ", "A", "B", " b", "b ", "", "  " };
