@@ -1,33 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace App.Topics.Dictionary.T3_Dictionary;
 
-//public static class DictionaryTasks
-//{
-//    public static System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, int>> TopNWords(string text, int n)
-//    {
-//        List<KeyValuePair<string, int>> res = new List<KeyValuePair<string, int>>();
-//        string tmp = "";
-//        foreach (var item in text)
-//        {
-//            if (!char.IsWhiteSpace(item) && !char.IsLetterOrDigit(item))
-//            {
-//                tmp += item;
-//            } else
-//            {
-//                if (res.Any(p => p.Key == tmp))
-//                {
-//                    foreach (var item1 in res)
-//                    {
-//                        if (item1.Key == tmp)
-//                        {
-//                            res.Add(new List<KeyValuePair<tmp, item1 .Value.Get+1>>);
-//                        }                        
-//                    }
-//                }
-//                tmp =
-//            }
-//        }
-//    }
-//}
+public static class DictionaryTasks
+{
+    public static List<KeyValuePair<string, int>> TopNWords(string text, int n)
+    {
+        if (string.IsNullOrWhiteSpace(text) || n <= 0) { return new List<KeyValuePair<string, int>>(); }
+        text = text.ToLowerInvariant();
+
+        var words = Regex.Split(text, @"[^a-z0-9à-ÿ¸]+", RegexOptions.IgnoreCase).Where(w => !string.IsNullOrWhiteSpace(w));
+
+        var freq = new Dictionary<string, int>();
+        foreach (var word in words)
+        {
+            if (freq.ContainsKey(word))
+                freq[word]++;
+            else
+                freq[word] = 1;
+        }
+
+        List<KeyValuePair<string, int>> sorted = freq.OrderByDescending(p => p.Value).ThenBy(p => p.Key).Take(n).ToList();
+
+        return sorted;
+    }
+}
